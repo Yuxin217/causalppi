@@ -1,6 +1,6 @@
 # causalppi
 
-Code for: "A Neural Method for Partial Identification of Treatment Effects with Complex Instruments".
+Code for: "Constructing Confidence Intervals for Average Treatment Effects from Multiple Observational Datasets".
 
 ### Folder structure
 
