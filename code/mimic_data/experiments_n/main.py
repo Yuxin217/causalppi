@@ -27,7 +27,7 @@ def run_experiment(config_run, scenario_name, sample_name, seed_list):
     pasx = config_run['pasx']
     gp_params = config_run['data_gen'][scenario_name]
 
-    name_list = ["normal_aipw", "normal_trial", "normal_ppi", "normal_obs"]
+    name_list = ["normal_aipw", "normal_ppi", "normal_obs"]
 
     for seed in seed_list:
         df = {}
@@ -69,11 +69,9 @@ def run_experiment(config_run, scenario_name, sample_name, seed_list):
    
 
 if __name__ == "__main__":
-    # seed_list = [0, 1, 2, 6, 7]
-    seed_list = [1, 2, 3, 4, 5]
-    scenario_list = ["scenario_1"]
+    seed_list = [0, 1, 2, 3, 4]
+    scenario_list = ["scenario_1"] # no-meaning
     sample_list = ["small_n", "ratio", "large_N"]
-    # sample_list = ["small_n"]
 
     relative_path = f"/mimic_data/experiments_n"
     config = load_yaml(f"{relative_path}/config")

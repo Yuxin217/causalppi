@@ -124,17 +124,6 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
     print("ate_est_aipw", ate_est_aipw)
     print("ate_ci_aipw", ate_ci_aipw)
 
-    '''Normal/Asymptotic setting: IPW/DR-learner'''
-    est = LinearDRLearner(model_regression=GradientBoostingRegressor(),
-                        model_propensity=GradientBoostingClassifier())
-    y_train = Y_train.reshape(n)
-    est.fit(y_train, A_train, X=X_train)
-    cate_n = est.effect(X_train)
-    ate_est_norm_trial = est.ate(X_train)
-    ate_ci_norm_trial = est.ate_interval(X_train, alpha=alpha)
-    print("ate_est_trial", ate_est_norm_trial)
-    print("ate_ci_trial", ate_ci_norm_trial)
-
     '''Normal/Asymptotic setting + PPI '''
     N = np.stack(np.array(dataset_val['y'])).shape[0]
     N_train = int(N/2)
@@ -145,11 +134,6 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
     X_N_eval = np.array(dataset_val['X']).reshape(-1, 1)[N_train:, :]
     A_N_eval = np.array(dataset_val['A']).reshape(-1, 1)[N_train:, :]
     Y_N_eval = np.stack(np.array(dataset_val['y']))[N_train:, :]
-
-    # est_2 = LinearDRLearner(model_regression=GradientBoostingRegressor(),
-    #                 model_propensity=GradientBoostingClassifier())
-    # y_N_train = Y_N_train.reshape(N_train)
-    # est_2.fit(y_N_train, T_N_train, X=X_N_train)
 
     est_2 = LinearDRLearner(model_regression=GradientBoostingRegressor(), model_propensity=GradientBoostingClassifier())
     y_N_train = Y_N_train.reshape(N_train)
@@ -179,20 +163,11 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
                   ate_est_obs + z_alpha * np.sqrt(var_N/N_eval))
     print("ate_ci_obs", ate_ci_obs)
 
-    return [ate_est_aipw, ate_est_norm_trial, ate_est_ppi, ate_est_obs], \
-           [ate_ci_aipw, ate_ci_norm_trial, ate_ci_norm_ppi, ate_ci_obs]
+    return [ate_est_aipw, ate_est_ppi, ate_est_obs], \
+           [ate_ci_aipw, ate_ci_norm_ppi, ate_ci_obs]
 
 def sim_cases(seed, df_rct, df_obs, significance_level, delta):
 
         ate_estimates, ate_ci = get_estimates(df_rct, df_obs, delta, significance_level)
 
-        # plot_case_rmse(save_dir, case_idx, estimates, mu_a_gt)
-
-        # consider how to set the streamline of the code
-        # stat_bias_sq_est = np.mean(ate_estimates[-1] - mean_trail, axis=0) ** 2
-        # stat_var_est = np.std(ate_estimates, axis=0) ** 2
-        # mse = np.mean((ate_estimates[-1] - mean_trail) ** 2, axis=0)
-        # rmse = np.sqrt(mse)        
-
-        # return stat_bias_sq_est, stat_var_est, rmse, ate_est, ate_cf
         return ate_estimates, ate_ci

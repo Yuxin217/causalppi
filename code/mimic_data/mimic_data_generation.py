@@ -16,20 +16,15 @@ class MIMICDataModule:
         
         self.n_rct = n_rct
         self.n_obs = n_obs
-        # self.n_MC = n_MC 
         self.seed = seed
         self.X_columns = ['gender',	'age', 'heart rate', 'sodium', 'blood cells', 'glucose', 'hematocrit', 'respiratory rate']
 
         self.gp_params = gp_params
         self.w_trt_params = self.gp_params['w_trt_par']   # GP for the propensity score in OBS study P(A=1 | X, S=2)
-        # self.prop_clip_lb = pasx["lb"]  #  exclude patients whose probability of treatment is < 0.1 
-        # self.prop_clip_ub = pasx["ub"]  #  exclude patients whose probability of treatment is > 0.9
     
         self.read_in_source_data = pd.read_csv(sys.path[0] + read_in_dir + 'mimic_data_train.csv')
-        # self.read_in_source_data = pd.read_csv(sys.path[-1] + read_in_dir + 'mimic_data_train.csv')
 
         std_info = pd.read_csv(sys.path[0] + read_in_dir + 'mimic_std_information.csv')
-        # std_info = pd.read_csv(sys.path[-1] + read_in_dir + 'mimic_std_information.csv')
         self.df_denormalize = pd.DataFrame()
         self.df_denormalize['gender'] = self.read_in_source_data['gender']
         self.df_denormalize['age'] = self.read_in_source_data['age']
@@ -42,10 +37,6 @@ class MIMICDataModule:
     def _generate_data(self):
         np.random.seed(self.seed + 1)
         frac = self.n_rct/self.original_n
-        # df = pd.DataFrame()
-        # df[self.X_columns] = self.df_denormalize[self.X_columns]
-        # df["A"] = self.df_denormalize['A']
-        # df["y"] = self.df_denormalize['y']
 
         df_rct = self.df_denormalize.sample(frac=frac, random_state=self.seed+1).reset_index(drop=True)
 
@@ -56,44 +47,10 @@ class MIMICDataModule:
         '''Initiate dataframe'''
         df_obs = pd.DataFrame()
         np.random.seed(self.seed + 2)
-        # df_obs[self.X_columns] = self.df[self.X_columns].sample(self.n_obs, replace=True)
-
-        # frac = self.n_obs/self.original_n
-        # df_obs = pd.DataFrame()
-        # df_obs[self.X_columns] = self.df_denormalize[self.X_columns]
-        # df["A"] = self.df_denormalize['A']
-        # df["y"] = self.df_denormalize['y']
-
-        # df_obs = self.df_denormalize.sample(frac=frac, random_state=self.seed+1).reset_index(drop=True)
 
         df_obs[self.X_columns + ['A', 'y']] = self.df_denormalize[self.X_columns + ['A', 'y']].sample(self.n_obs, replace=True)
 
         return df_obs
-    
-        # # '''fit and smaple propensity score'''
-        # # df_obs[self.X_columns] = self.df[self.X_columns].sample(self.n_obs, replace=True)
-        # # df_obs['U'] = 2 * np.random.rand(self.n_obs, 1) - 1  # Uniform[-1,1]
-        # # prob_A = self.kernel_sample(np.array(df_obs[self.X_columns]), np.array(df_obs['U']).reshape(-1, 1))
-        # # df_obs["P(A=1|X)"] = np.clip(expit(prob_A), self.prop_clip_lb, self.prop_clip_ub)
-        # # df_obs["A"] = np.array(df_obs["P(A=1|X)"] > np.random.uniform(size=self.n_obs), dtype=int)
-
-
-        # model_e = LogisticRegression().fit(np.array(self.read_in_source_data[self.X_columns]), np.array(self.read_in_source_data["assign"]))
-        # prob_e = model_e.predict_proba(np.array(df_obs[self.X_columns]))[:, 1]
-        # # prob_y = np.clip(expit(prob_y), self.prop_clip_lb, self.prop_clip_ub)
-        # df_obs["A"] = np.array(prob_e > np.random.uniform(size=self.n_obs), dtype=int)
-        
-        # # '''fit and smaple y'''
-        # train_data = np.concatenate((np.array(self.read_in_source_data[self.X_columns]), np.array(self.read_in_source_data["assign"]).reshape(-1, 1)), axis=1)
-        # model_y = LogisticRegression().fit(train_data, np.array(self.read_in_source_data["outcome"]))
-        # test_data = np.concatenate((np.array(df_obs[self.X_columns]), np.array(df_obs["A"]).reshape(-1, 1)), axis=1)
-        # prob_y = model_y.predict_proba(test_data)[:, 1]
-        # # prob_y = np.clip(expit(prob_y), self.prop_clip_lb, self.prop_clip_ub)
-        # df_obs["y"] = np.array(prob_y> np.random.uniform(size=self.n_obs), dtype=int)
-
-        # # df_obs = df_obs.drop(columns=["P(A=1|X)", "U"])
-        
-        # return df_obs
 
     def get_df(self):
         np.random.seed(self.seed)
@@ -106,18 +63,8 @@ class MIMICDataModule:
         X1 = X1 / length_scales
         X2 = X2 / length_scales
         
-        # X1_norm2 = np.sum(np.dot(X1, X1.T), axis = 1).reshape(-1, 1)
-        # X2_norm2 = np.sum(np.dot(X2, X2.T), axis = 1).reshape(-1, 1)
-
-        # X1_norm2 = np.linalg.norm(X1, ord = 2, axis = 1).reshape(-1, 1)
-        # X2_norm2 = np.linalg.norm(X2, ord = 2, axis = 1).reshape(-1, 1)
-
-        # distances =  -2.0 * np.dot(X1, X2.T) + np.tile(X1_norm2, (1, X2.shape[0])) + np.tile(X2_norm2.T, (X1.shape[0], 1))
         distances =  -2.0 * np.dot(X1, X2.T) + np.dot(X1, X1.T) + np.dot(X2, X2.T)
-
-        # distances = np.linalg.norm((X1[:, None, :] - X2[None, :, :]) / length_scales, axis=2)
         rbf_term = var * np.exp(-0.5 * distances**2)
-        # linear_term = np.dot(np.dot(X1, np.diag(alpha)), X2.T)
         linear_term = alpha[-1] * np.dot(X2, X2.T)
         return rbf_term + linear_term
 
@@ -125,8 +72,6 @@ class MIMICDataModule:
     def kernel_sample(self, X, U):
         np.random.seed(self.seed)
         XU = np.concatenate((X, U), axis=1)
-        # XX, UU = np.meshgrid(X, U)
-        # XU_flat = np.c_[XX.ravel(), UU.ravel()]
 
         mean = np.zeros(len(XU))
 
@@ -160,5 +105,4 @@ if __name__ == "__main__":
     }
 
     mimic_data = MIMICDataModule(gp_params, 200, 10000, '/data_source/', 42)
-    # print(covid_data.save_processed_data())
     print(mimic_data.get_true_mean(n_MC=10000))

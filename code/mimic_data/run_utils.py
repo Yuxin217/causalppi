@@ -46,12 +46,7 @@ def rbf_linear_kernel(X1, X2, length_scales=np.array([0.1,0.1]), alpha=np.array(
     return rbf_term + linear_term
 
 def data_generation(gp_params, all_covs, big_n_rct, big_n_obs, n_MC, X_range, U_range, pasx, seed):
-    # gp_funcs = {}
 
-    # gp_funcs["om_A0"] = sample_outcome_model_gp(X_range, U_range, gp_params["om_A0_par"], seed + 0)  # GP - outcome model under treatment A=0
-    # gp_funcs["om_A1"] = sample_outcome_model_gp(X_range, U_range, gp_params["om_A1_par"], seed + 1)  # GP - outcome model under treatment A=1
-    # gp_funcs["w_sel"] = sample_outcome_model_gp(X_range, U_range, gp_params["w_sel_par"], seed + 2)  # GP - selection score model P(S=1|X)
-    # gp_funcs["w_trt"] = sample_outcome_model_gp(X_range, U_range, gp_params["w_trt_par"], seed + 3)  # GP - propensity score in OBS study P(A=1|X, S=2)
     pre_path = '/mimic_data/data_source/'
     Data = MIMICDataModule(gp_params, big_n_rct, big_n_obs, pre_path, seed + 4)
     # mean_trail, _ = Data.get_true_mean()
@@ -124,16 +119,6 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
     print("ate_est_aipw", ate_est_aipw)
     print("ate_ci_aipw", ate_ci_aipw)
 
-    '''Normal/Asymptotic setting: IPW/DR-learner'''
-    est = LinearDRLearner(model_regression=GradientBoostingRegressor(),
-                        model_propensity=GradientBoostingClassifier())
-    y_train = Y_train.reshape(n)
-    est.fit(y_train, A_train, X=X_train)
-    cate_n = est.effect(X_train)
-    ate_est_norm_trial = est.ate(X_train)
-    ate_ci_norm_trial = est.ate_interval(X_train, alpha=alpha)
-    print("ate_est_trial", ate_est_norm_trial)
-    print("ate_ci_trial", ate_ci_norm_trial)
 
     '''Normal/Asymptotic setting + PPI '''
     N = np.stack(np.array(dataset_val['y'])).shape[0]
@@ -150,9 +135,6 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
                     model_propensity=GradientBoostingClassifier())
     y_N_train = Y_N_train.reshape(N_train)
     est_2.fit(y_N_train, A_N_train, X=X_N_train)
-    # cate_N = est_2.effect(X_N_eval)
-    # ate_N = np.mean(cate_N)
-    # var_N = np.var(cate_N)
 
     model_e = LogisticRegression().fit(X_N_train, A_N_train)
     e_N = model_e.predict_proba(X_N_eval)[:, 1].reshape(-1, 1)
@@ -197,20 +179,11 @@ def get_estimates(dataset_train, dataset_val, delta, significance_level = 0.05):
     ate_ci_obs = est_2.ate_interval(X_N_eval, alpha=alpha)
     print("ate_ci_obs", ate_ci_obs)
 
-    return [ate_est_aipw, ate_est_norm_trial, ate_est_ppi, ate_est_obs], \
-           [ate_ci_aipw, ate_ci_norm_trial, ate_ci_norm_ppi, ate_ci_obs]
+    return [ate_est_aipw, ate_est_ppi, ate_est_obs], \
+           [ate_ci_aipw, ate_ci_norm_ppi, ate_ci_obs]
 
 def sim_cases(seed, df_rct, df_obs, significance_level, delta):
 
         ate_estimates, ate_ci = get_estimates(df_rct, df_obs, delta, significance_level)
 
-        # plot_case_rmse(save_dir, case_idx, estimates, mu_a_gt)
-
-        # consider how to set the streamline of the code
-        # stat_bias_sq_est = np.mean(ate_estimates[-1] - mean_trail, axis=0) ** 2
-        # stat_var_est = np.std(ate_estimates, axis=0) ** 2
-        # mse = np.mean((ate_estimates[-1] - mean_trail) ** 2, axis=0)
-        # rmse = np.sqrt(mse)        
-
-        # return stat_bias_sq_est, stat_var_est, rmse, ate_est, ate_cf
         return ate_estimates, ate_ci

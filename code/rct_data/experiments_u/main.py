@@ -40,7 +40,7 @@ def run_experiment(config_run, seed_list, methods_list, alpha):
 
         for seed_index in range(len(seed_list)):
             df = pd.DataFrame()
-            # df['RowNames'] = methods_list
+
             df_rct = big_df_rct.iloc[seed_index * n_rct : (seed_index + 1) * n_rct]
             df_obs = big_df_obs.iloc[seed_index * n_obs : (seed_index + 1) * n_obs]
             ate_est, ate_ci = sim_cases(seed_list[seed_index], df_rct, df_obs, alpha, delta)
@@ -48,8 +48,6 @@ def run_experiment(config_run, seed_list, methods_list, alpha):
             df["true_ate"] = [mean_trail for i in range(len(methods_list))]
             df["ate_est"] = ate_est
             df["ate_ci_width"] = [0.5 * (ate_ci[i][1] - ate_ci[i][0]) for i in range(len(methods_list))]
-            # df.rename(index={0: "normal_trial", 1: "hf_trial", 2: "normal_ppi", 3: "hf_ppi", 4: "normal_obs"}, inplace=True)
-            # df = df.set_index('RowNames')
 
             if not os.path.exists(f"{save_dir}/exp_results/alpha_{alpha}/unconfounding_{ns}"):
                 os.makedirs(f"{save_dir}/exp_results/alpha_{alpha}/unconfounding_{ns}")
@@ -58,10 +56,10 @@ def run_experiment(config_run, seed_list, methods_list, alpha):
    
 
 if __name__ == "__main__":
-    seed_list = [list(range(10)), list(range(10, 20))]
+    seed_list = [list(range(0, 10, 2)), list(range(1, 11, 2))]
     alpha_list = [0.05, 0.1]
-    methods_list = ["normal_aipw", "normal_trial", "normal_ppi", "normal_obs"]
-    config_run = load_yaml("/RCT_data/experiments_u/config")
+    methods_list = ["normal_aipw", "normal_ppi", "normal_obs"]
+    config_run = load_yaml("/rct_data/experiments_u/config")
 
     for alpha_index in [1]:
         run_experiment(config_run, seed_list[alpha_index], methods_list, alpha=alpha_list[alpha_index])

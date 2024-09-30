@@ -17,12 +17,11 @@ def run_experiment(config_run, scenario_name, sample_name, target_col, seed_list
     n_obs_param = config_run['sample_settings'][sample_name]['n_obs']
     n_obs_list = [n_obs_param[0]+i*n_obs_param[1] for i in range(n_obs_param[2])]
     big_n_obs = sum(n_obs_list)
-    # n_MC = config_run['data']['n_MC']
 
     pasx = config_run['pasx']
     gp_params = config_run['data_gen'][scenario_name]
 
-    name_list = ["normal_aipw", "normal_trial", "normal_ppi", "normal_obs"]
+    name_list = ["normal_aipw", "normal_ppi", "normal_obs"]
 
     for seed in seed_list:
         df = {}
@@ -70,11 +69,9 @@ def run_experiment(config_run, scenario_name, sample_name, target_col, seed_list
    
 
 if __name__ == "__main__":
-    # seed_list = [0, 1, 2, 6, 7]
-    seed_list = [0]
-    scenario_list = ["scenario_1"]
+    seed_list = [0,1,2,3,4]
+    scenario_list = ["scenario_2"]
     sample_list = ["small_n", "ratio", "large_N"]
-    # sample_list = ["small_n"]
 
     relative_path = f"/covid_data/experiments_ethnics"
     config = load_yaml(f"{relative_path}/config")

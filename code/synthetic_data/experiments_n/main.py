@@ -26,8 +26,7 @@ def run_experiment(config_run, scenario_name, sample_name, seed_list):
     pasx = config_run['pasx']
     gp_params = config_run['data_gen'][scenario_name]
 
-    # name_list = ["normal_trial", "hf_trial", "normal_ppi", "hf_ppi", "normal_obs"]
-    name_list = ["normal_aipw", "normal_trial", "normal_ppi", "normal_obs"]
+    name_list = ["normal_aipw", "normal_ppi", "normal_obs"]
 
     for seed in seed_list:
         df = {}
@@ -53,7 +52,6 @@ def run_experiment(config_run, scenario_name, sample_name, seed_list):
                 df[name_list[j] + "_est"].append(ate_est[j])
                 df[name_list[j] + "_width"].append(0.5 * (ate_ci[j][1] - ate_ci[j][0]))
 
-            # print(f"done with {iter+1}-th iteration")
             df['n_rct'].append(n_rct)
             df['n_obs'].append(n_obs)
 
@@ -68,11 +66,10 @@ def run_experiment(config_run, scenario_name, sample_name, seed_list):
         estimates.to_csv(f"{save_dir}/estimates_{seed}.csv")
 
 if __name__ == "__main__":
-    # seed_list = [0, 1, 2, 6, 7]
-    seed_list = [0]
-    scenario_list = ["scenario_1"]
-    sample_list = ["small_n"]
-    # sample_list = ["small_n"]
+
+    seed_list = [0,1,2,3,4]
+    scenario_list = ["scenario_1", "scenario_2", "scenario_3"]
+    sample_list = ["small_n", "ratio", "large_N"]
 
     relative_path = f"/synthetic_data/experiments_n"
     config = load_yaml(f"{relative_path}/config")
