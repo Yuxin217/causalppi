@@ -23,10 +23,7 @@ class SyntheticDataModule:
                 ):
         
         self.n_rct = n_rct
-        # self.n_tar = n_tar
         self.n_obs = 2*n_obs
-        # self.n = 10 * (n_rct + n_tar)  # auxiliary variable used in data generating
-        # self.n = n_rct + n_tar
         self.n_small = n_rct
         self.n_MC = n_MC  # monte-carlo sample size to calculate "true mean" in the target population
         self.covs = covs
@@ -49,16 +46,14 @@ class SyntheticDataModule:
         self.sbl, self.sbu = 0.5, 1
 
 
-
     def _generate_data(self, size):  
-
+        # complete = False
         complete = True
 
         while not complete:
             try:
                 df = pd.DataFrame(index=np.arange(self.n))
                 df[self.covs] = 2 * np.random.rand(self.n, self.d) - 1  # Uniform[-1,1]
-
 
                 df["P(S=0|X)"] = df.apply(lambda row: \
                             int(self.sbl < row["X"] < self.sbu) * np.clip(expit(self.w_sel(row["X"], row["U"])[0]), self.prop_clip_lb, self.prop_clip_ub), axis=1)
@@ -71,7 +66,6 @@ class SyntheticDataModule:
             except:
                 print("Please wait patiently as we generate your synthetic nested trial data...")
                 self.n = 2 * self.n
-
                 
         np.random.seed(self.seed + 1)
         df = pd.DataFrame(index=np.arange(self.n))
@@ -138,6 +132,7 @@ class SyntheticDataModule:
 
         np.random.seed(self.seed + 1)
         df = pd.DataFrame(index=np.arange(self.n_MC))
+        # df[self.covs] = 2 * np.random.rand(self.n_MC, self.d) - 1  # Uniform[-1,1]
         df[self.covs[0]] = 2 * np.random.rand(self.n_MC, 1) - 1 
         df[self.covs[1]] = np.zeros(self.n_MC).reshape(-1, 1)
 
@@ -149,11 +144,11 @@ class SyntheticDataModule:
 
         true_ate, std_ate = treatment_effect.mean(),treatment_effect.std() / self.n_MC
 
+
         if print_res:
             print(f"MC sample sizes: n_MC = {self.n_MC}")
             # print(f"Target pop. mean: {mean_S0Y1:.3f} +- {std_S0Y1:.3f}")
             print(f"Trial pop. mean: {true_ate:.3f} +- {std_ate:.3f}")
-
 
         return true_ate, std_ate
     

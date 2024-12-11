@@ -31,7 +31,7 @@ seed_list_dic = {
 title_dic = {0: "Scenario 1", 1: "Scenario 2", 2: "Scenario 3"}
 
 
-exp_name = "synthetic_data" # "synthetic_data", "RCT_data"
+exp_name = "synthetic_data" # "synthetic_data", "RCT_data", "synthetic_data_multi", "synthetic_data_ass", "synthetic_data_XGBoost", "synthetic_data_dependence"
 fig, ax = plt.subplots(2, 3, figsize=(8, 6))
 
 for alpha_index in [0, 1]:
@@ -85,7 +85,7 @@ plt.savefig(f"{path}/figs/results/{exp_name}/experiments_u.pdf", bbox_inches="ti
 
 '''rct/obs width'''
 
-exp_name = "rct_data" # "synthetic_data", "rct_data"
+exp_name = "rct_data" # "synthetic_data", "rct_data", "synthetic_data_multi", "synthetic_data_ass", "synthetic_data_XGBoost", "synthetic_data_dependence"
 name_list = ["normal_ppi", "normal_aipw", "normal_obs"]
 read_dir = f"{path}/code/{exp_name}/experiments_n/exp_results/"
 

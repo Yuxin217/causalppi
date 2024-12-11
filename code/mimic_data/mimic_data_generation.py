@@ -15,7 +15,7 @@ class MIMICDataModule:
                 seed=42,):
         
         self.n_rct = n_rct
-        self.n_obs = n_obs
+        self.n_obs = 2*n_obs
         self.seed = seed
         self.X_columns = ['gender',	'age', 'heart rate', 'sodium', 'blood cells', 'glucose', 'hematocrit', 'respiratory rate']
 

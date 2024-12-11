@@ -16,7 +16,7 @@ class CovidDataModule:
                 seed=42):
         
         self.n_rct = n_rct
-        self.n_obs = n_obs
+        self.n_obs = 2*n_obs
         self.seed = seed
         self.target_col = target_col
         if target_col == 'Region':
