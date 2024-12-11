@@ -1,6 +1,6 @@
 # causalppi
 
-Code for: "Constructing Confidence Intervals for Average Treatment Effects from Multiple Observational Datasets".
+Code for: "Constructing Confidence Intervals for Average Treatment Effects from Multiple Datasets".
 
 ### Folder structure
 
