@@ -5,12 +5,17 @@ Estimating confidence intervals (CIs) of the average treatment effects (ATE) fro
 
 ![Overview of our method](figs/flowchart_ppi.png)
 
+### Installations
+
+The project is mainlt built upon the following Python 3.11.9 and econml. All neccessary libraries are stated in requirements.txt:
+`pip3 install -r requirements.txt`
+
 ### Folder structure
 
 Our python code are stored by different dataset in the folders, we take `rct_data` as an example:
 
 1. `synthetic_data_generation`: script for generating datasets
-2. `run_utils`: train models, create confidence intervals
+2. `run_utils`: train models, create conf didence intervals
 3. `experiments_u/main`: run specific experiments and store results
 4. `plot`: plot and summarize the results
 
